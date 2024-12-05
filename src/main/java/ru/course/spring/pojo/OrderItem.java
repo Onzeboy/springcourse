@@ -18,16 +18,16 @@ public class OrderItem {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @Column(name = "order_id", nullable = false)
-    private OrderTable orderTable;
+    @Column(name = "orderTable_id", nullable = false)
+    private OrderTable orderItemOrderTable;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @Column(name = "product_id", nullable = false)
-    private Product product;
+    private Product orderItemProduct;
 
     @Column(name = "quantity", nullable = false)
-    private Integer quantity;
+    private Integer orderItemQuantity;
 
     @Column(name = "price", nullable = false)
-    private Integer price;
+    private Integer orderItemPrice;
 }

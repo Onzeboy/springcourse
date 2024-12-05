@@ -18,12 +18,12 @@ public class CartItem {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cart_id", nullable = false)
-    private Cart cart; // Связь с таблицей Cart
+    private Cart cartItemCart; // Связь с таблицей Cart
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
-    private Product product; // Связь с таблицей Product
+    private Product cartItemProduct; // Связь с таблицей Product
 
     @Column(name = "quantity", nullable = false)
-    private Integer quantity;
+    private Integer cartItemQuantity;
 }

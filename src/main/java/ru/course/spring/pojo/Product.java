@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "Product")
@@ -15,12 +17,19 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
+
     @Column(name = "name")
-    private String name;
+    private String productName;
+
     @Column(name = "price")
-    private Integer priceCent;
+    private Integer productpriceCent;
+
     @Column(name = "image")
-    private String image;
+    private String productImage;
+
+    @OneToMany(mappedBy = "cartItemProduct",cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CartItem> productCartItems;
+    private int priceCent;
 
     public Double getPriceInRubles() {
         return priceCent / 100.0;

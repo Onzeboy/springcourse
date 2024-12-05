@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -18,18 +19,22 @@ public class OrderTable {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User orderTableUser;
 
     @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
+    private LocalDateTime orderTableCreatedAt;
 
     @Column(name = "city", nullable = false)
-    private String city;
+    private String orderTableCity;
 
     @Column(name = "street", nullable = false)
-    private String street;
+    private String orderTableStreet;
 
     @Column(name = "home", nullable = false)
-    private String home;
+    private String orderTableHome;
+
+    @OneToMany(mappedBy = "orderItemOrderTable",cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderItem> orderItems;
 }

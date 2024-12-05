@@ -5,7 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-    @NoArgsConstructor
+import java.util.List;
+
+@NoArgsConstructor
     @AllArgsConstructor
     @Table(name = "users") // Имя таблицы в БД
     @Entity
@@ -24,5 +26,11 @@ import lombok.NoArgsConstructor;
 
         @Column(name = "role", nullable = false)
         private String role; // Например, "USER", "ADMIN"
+
+        @OneToMany(mappedBy = "cartUser", cascade = CascadeType.ALL, orphanRemoval = true)
+        private List<Cart> carts;
+
+        @OneToMany(mappedBy = "orderTableUser", cascade = CascadeType.ALL, orphanRemoval = true)
+        private List<OrderTable> orderTables;
     }
 
