@@ -18,11 +18,11 @@ public class OrderItem {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @Column(name = "orderTable_id", nullable = false)
+    @JoinColumn(name = "orderTable_id", nullable = false)
     private OrderTable orderItemOrderTable;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @Column(name = "product_id", nullable = false)
+    @JoinColumn(name = "product_id", nullable = false)
     private Product orderItemProduct;
 
     @Column(name = "quantity", nullable = false)

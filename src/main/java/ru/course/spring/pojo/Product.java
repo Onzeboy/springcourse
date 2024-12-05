@@ -22,13 +22,14 @@ public class Product {
     private String productName;
 
     @Column(name = "price")
-    private Integer productpriceCent;
+    private int productPriceCent;
 
     @Column(name = "image")
     private String productImage;
 
     @OneToMany(mappedBy = "cartItemProduct",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CartItem> cartItems;
+
     private int priceCent;
 
     public Double getPriceInRubles() {
