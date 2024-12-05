@@ -19,13 +19,13 @@ import java.util.List;
         private Long id;
 
         @Column(name = "username", nullable = false, unique = true)
-        private String username;
+        private String userName;
 
         @Column(name = "password", nullable = false)
-        private String password;
+        private String userPassword;
 
         @Column(name = "role", nullable = false)
-        private String role; // Например, "USER", "ADMIN"
+        private String userRole; // Например, "USER", "ADMIN"
 
         @OneToMany(mappedBy = "cartUser", cascade = CascadeType.ALL, orphanRemoval = true)
         private List<Cart> carts;

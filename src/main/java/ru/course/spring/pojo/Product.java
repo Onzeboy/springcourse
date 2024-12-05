@@ -28,7 +28,7 @@ public class Product {
     private String productImage;
 
     @OneToMany(mappedBy = "cartItemProduct",cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CartItem> productCartItems;
+    private List<CartItem> cartItems;
     private int priceCent;
 
     public Double getPriceInRubles() {
