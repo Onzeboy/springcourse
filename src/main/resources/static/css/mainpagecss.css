@@ -6,6 +6,9 @@
 
 body {
     font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 header {
@@ -15,6 +18,7 @@ header {
     background-color: #333;
     color: white;
     padding: 10px 20px;
+    width: 100%;
 }
 
 .logo {
@@ -35,11 +39,20 @@ nav ul li a {
     text-decoration: none;
 }
 
-main {
+.container {
+    flex: 1;
+    padding: 20px 15%; /* Отступы по бокам на 15% */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.boxes-container {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
-    padding: 20px;
+    justify-content: center;
+    width: 100%;
 }
 
 .box {
@@ -47,19 +60,40 @@ main {
     border: 1px solid #ccc;
     padding: 20px;
     text-align: center;
-    flex: 1 1 30%; /* Flex-grow, flex-shrink, flex-basis */
+    width: 300px; /* Фиксированная ширина */
+    height: 150px; /* Фиксированная высота */
     margin: 10px;
     box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background-color: #f4f4f4;
+    width: 100%;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.footer button {
+    padding: 10px 20px;
+    cursor: pointer;
 }
 
 @media (max-width: 900px) {
     .box {
-        flex: 1 1 45%; /* Два блока в ряд на средних экранах */
+        width: 250px; /* Фиксированная ширина для средних экранов */
+        height: 120px; /* Фиксированная высота для средних экранов */
     }
 }
 
 @media (max-width: 600px) {
     .box {
-        flex: 1 1 100%; /* Один блок в ряд на маленьких экранах */
+        width: 100%; /* Полная ширина для маленьких экранов */
+        height: 150px; /* Фиксированная высота для маленьких экранов */
     }
 }
