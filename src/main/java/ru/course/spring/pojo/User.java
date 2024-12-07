@@ -18,6 +18,12 @@ import java.util.List;
         @Column(name = "id")
         private Long id;
 
+        @Column(name = "email")
+        private String userEmail;
+
+        @Column(name = "phoneNumber")
+        private String userPhoneNumber;
+
         @Column(name = "username", nullable = false, unique = true)
         private String userName;
 

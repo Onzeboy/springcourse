@@ -1,14 +1,32 @@
 package ru.course.spring.controllers;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import ru.course.spring.pojo.Product;
 import ru.course.spring.repository.ProductRepository;
+import ru.course.spring.services.ProductService;
 
 @Controller
 public class ProductController  {
-    private final ProductRepository productRepository;
 
-    public ProductController(ProductRepository productRepository){
-        this.productRepository = productRepository;
+    @Autowired
+    private ProductService productService;
+
+
+    @GetMapping("/products")
+    public String getProducts(@RequestParam(defaultValue = "0") int page,
+                              @RequestParam(defaultValue = "12") int size,
+                              Model model) {
+        Page<Product> productPage = productService.getProducts(page, size);
+        model.addAttribute("products", productPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", productPage.getTotalPages());
+        model.addAttribute("totalItems", productPage.getTotalElements());
+        model.addAttribute("size", size);
+        return "mainPage";
     }
-
 }

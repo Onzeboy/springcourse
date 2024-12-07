@@ -43,30 +43,64 @@ nav ul li a {
     flex: 1;
     padding: 20px 15%; /* Отступы по бокам на 15% */
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-}
-
-.boxes-container {
-    display: flex;
     flex-wrap: wrap;
-    justify-content: center;
+    justify-content: center; /* Центрирование элементов по горизонтали */
     width: 100%;
 }
 
-.box {
+.product-box {
     background-color: #f4f4f4;
     border: 1px solid #ccc;
     padding: 20px;
     text-align: center;
-    width: 300px; /* Фиксированная ширина */
-    height: 150px; /* Фиксированная высота */
+    width: 200px; /* Фиксированная ширина */
     margin: 10px;
     box-sizing: border-box;
     display: flex;
+    flex-direction: column;
     align-items: center;
+}
+
+.product-image img {
+    width: 100%; /* Полная ширина блока */
+    height: auto; /* Сохраняем пропорции */
+    max-height: 150px; /* Максимальная высота изображения */
+    object-fit: contain; /* Вписываем изображение в контейнер */
+}
+
+.product-info {
+    padding: 10px;
+    flex-grow: 1; /* Разрешаем растягиваться */
+    display: flex;
+    flex-direction: column;
     justify-content: center;
+}
+
+.product-name {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.product-price {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.add-to-cart {
+    padding: 10px 15px;
+    font-size: 14px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.add-to-cart:hover {
+    background-color: #0056b3;
 }
 
 .footer {
@@ -85,15 +119,13 @@ nav ul li a {
 }
 
 @media (max-width: 900px) {
-    .box {
-        width: 250px; /* Фиксированная ширина для средних экранов */
-        height: 120px; /* Фиксированная высота для средних экранов */
+    .product-box {
+        width: calc(50% - 20px); /* Два блока в ряд */
     }
 }
 
 @media (max-width: 600px) {
-    .box {
-        width: 100%; /* Полная ширина для маленьких экранов */
-        height: 150px; /* Фиксированная высота для маленьких экранов */
+    .product-box {
+        width: calc(100% - 20px); /* Один блок в ряд */
     }
 }

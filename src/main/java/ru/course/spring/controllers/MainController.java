@@ -8,6 +8,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class MainController {
     @GetMapping("/")
     public String startPage(){
-        return "mainPage";
+        return "redirect:/products";
     }
 }

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Website Layout</title>
+    <title>Products</title>
     <link rel="stylesheet" href="css/mainpagecss.css">
 </head>
 <body>
@@ -17,22 +17,23 @@
     </nav>
 </header>
 <main class="container">
-    <div id="boxes-container" class="boxes-container">
-        <div class="box">Box 1</div>
-        <div class="box">Box 2</div>
-        <div class="box">Box 3</div>
-        <div class="box">Box 4</div>
-        <div class="box">Box 5</div>
-        <div class="box">Box 6</div>
-        <div class="box">Box 7</div>
-        <div class="box">Box 8</div>
-        <div class="box">Box 9</div>
-        <!-- Добавьте больше элементов по мере необходимости -->
+    <div class="product-box" th:each="product : ${products}">
+        <div class="product-image">
+            <img src="https://via.placeholder.com/200x200" alt="Product Image">
+        </div>
+        <div class="product-info">
+            <p class="product-name" th:text="${product.productName}">Product Name</p>
+            <p class="product-price" th:text="${product.productPriceCent}">Product Price</p>
+        </div>
+        <button class="add-to-cart">Добавить в корзину</button>
     </div>
 </main>
 <footer class="footer">
-    <button onclick="loadMore()" id="load-more-btn">Load More</button>
+    <div class="pagination">
+        <a th:if="${currentPage > 0}" th:href="@{/products(page=${currentPage - 1}, size=${size})}">Previous</a>
+        <span>Page <span th:text="${currentPage + 1}"></span> of <span th:text="${totalPages}"></span></span>
+        <a th:if="${currentPage < totalPages - 1}" th:href="@{/products(page=${currentPage + 1}, size=${size})}">Next</a>
+    </div>
 </footer>
-<script src="js/mainpage.js"></script>
 </body>
 </html>
