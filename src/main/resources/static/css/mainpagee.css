@@ -1,0 +1,213 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+header {
+    position: fixed; /* Закрепляем заголовок сверху */
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f0f0f0; /* Цвет чуть темнее белого */
+    color: black; /* Черный цвет текста */
+    padding: 20px 30px; /* Увеличенные отступы */
+    width: 100%;
+    z-index: 1000; /* Убедитесь, что заголовок находится поверх контента */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Добавляем тень под заголовком */
+}
+
+.logo {
+    font-size: 2em; /* Увеличенный размер шрифта */
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+}
+
+nav ul li {
+    margin-left: 20px;
+}
+
+nav ul li a {
+    color: black; /* Черный цвет текста */
+    text-decoration: none;
+}
+
+.container {
+    flex: 1;
+    padding: 80px 10% 20px 10%; /* Уменьшенные отступы по сторонам */
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center; /* Центрирование элементов по горизонтали */
+    width: 100%;
+}
+
+.product-box {
+    background-color: #ffffff; /* Белый фон */
+    width: 300px; /* Увеличенная ширина */
+    height: auto; /* Автоматическая высота */
+    margin: 15px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 10px;
+    transition: box-shadow 0.3s ease; /* Переход для тени */
+}
+
+.product-box:hover {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Тень при наведении */
+}
+
+.product-image, .product-info {
+    width: 100%; /* Ширина 100% */
+    padding: 10px; /* Одинаковые отступы */
+    box-sizing: border-box; /* Включаем отступы в размеры */
+}
+
+.product-image {
+    background-color: #ffffff; /* Белый фон для блока изображения */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.product-image img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain; /* Вписываем изображение в контейнер */
+}
+
+.product-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Выравнивание по левому краю */
+    justify-content: space-between; /* Распределение пространства между элементами */
+    width: 100%; /* Занимаем всю ширину блока */
+    text-align: left; /* Выравнивание текста по левому краю */
+}
+
+.product-name {
+    font-size: 16px; /* Увеличенный размер шрифта */
+    font-weight: bold;
+    margin-bottom: 10px; /* Отступ снизу */
+    width: calc(100% - 20px); /* Занимаем всю ширину блока с учетом отступов */
+    padding: 0 10px; /* Отступы слева и справа */
+}
+
+.product-price-cart {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-top: auto; /* Прижимаем к низу */
+    padding: 0 10px; /* Отступы слева и справа */
+}
+
+.product-price {
+    font-size: 14px; /* Увеличенный размер шрифта */
+    color: #000; /* Обычный черный цвет */
+    margin-bottom: 0; /* Убраны отступы снизу */
+    padding: 0; /* Убраны отступы */
+}
+
+.add-to-cart {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.add-to-cart img {
+    width: 24px; /* Увеличенный размер иконки */
+    height: 24px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.add-to-cart:hover img {
+    transform: scale(1.2); /* Увеличение иконки при наведении */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Тень вокруг иконки при наведении */
+}
+
+.footer {
+    position: relative; /* Изменяем на relative */
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: rgba(255, 255, 255, 0); /* Полностью прозрачный фон */
+    box-shadow: none; /* Убираем тень */
+    z-index: 1000; /* Убедитесь, что футер находится поверх контента */
+    margin-top: auto; /* Прижимаем футер к низу контейнера */
+}
+
+.footer button {
+    padding: 10px 20px;
+    cursor: pointer;
+    background-color: #ffffff; /* Белый фон */
+    border: 1px solid #cccccc; /* Светло-серый бордер */
+    border-radius: 0; /* Угловатая кнопка */
+    font-size: 16px; /* Увеличенный размер шрифта */
+    transition: background-color 0.3s ease; /* Переход для фона */
+}
+
+.footer button:hover {
+    background-color: #f0f0f0; /* Светло-серый фон при наведении */
+}
+
+body, .container, .product-box, .product-info, .product-price-cart {
+    background: none; /* Убираем фон у всех элементов */
+}
+
+/* Убираем выделение для всех элементов */
+*:focus, *:active {
+    outline: none;
+    border: none;
+    background: none;
+}
+
+/* Убираем выделение для ссылок */
+a:focus, a:active {
+    outline: none;
+    border: none;
+    background: none;
+}
+
+/* Убираем выделение для изображений */
+img:focus, img:active {
+    outline: none;
+    border: none;
+    background: none;
+}
+
+/* Убираем выделение для блоков */
+.product-box:focus, .product-box:active {
+    outline: none;
+    border: none;
+    background: none;
+}
+
+@media (max-width: 900px) {
+    .product-box {
+        width: calc(50% - 30px); /* Два блока в ряд */
+    }
+}
+
+@media (max-width: 600px) {
+    .product-box {
+        width: calc(100% - 30px); /* Один блок в ряд */
+    }
+}

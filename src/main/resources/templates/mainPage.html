@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Products</title>
-    <link rel="stylesheet" href="css/mainpagecss.css">
+    <link rel="stylesheet" href="css/mainpagee.css">
 </head>
 <body>
 <header>
@@ -16,24 +16,27 @@
         </ul>
     </nav>
 </header>
-<main class="container">
+
+<main class="container" id="product-container">
     <div class="product-box" th:each="product : ${products}">
         <div class="product-image">
-            <img src="https://via.placeholder.com/200x200" alt="Product Image">
+            <img src="https://via.placeholder.com/300x200" alt="Product Image">
         </div>
         <div class="product-info">
             <p class="product-name" th:text="${product.productName}">Product Name</p>
-            <p class="product-price" th:text="${product.productPriceCent}">Product Price</p>
+            <div class="product-price-cart">
+                <p class="product-price" th:text="${product.productPriceCent}">Product Price</p>
+                <a href="#" class="add-to-cart">
+                    <img src="img/icons8-тележка-из-магазина-64.png" alt="Add to Cart">
+                </a>
+            </div>
         </div>
-        <button class="add-to-cart">Добавить в корзину</button>
     </div>
 </main>
 <footer class="footer">
-    <div class="pagination">
-        <a th:if="${currentPage > 0}" th:href="@{/products(page=${currentPage - 1}, size=${size})}">Previous</a>
-        <span>Page <span th:text="${currentPage + 1}"></span> of <span th:text="${totalPages}"></span></span>
-        <a th:if="${currentPage < totalPages - 1}" th:href="@{/products(page=${currentPage + 1}, size=${size})}">Next</a>
-    </div>
+    <button id="load-more" data-page="1" data-size="12">Load More</button>
 </footer>
+
+<script src="js/mainpagejs.js"></script>
 </body>
 </html>
