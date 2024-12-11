@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @Table(name = "Product")
 @Entity
-@Data
+ @Data
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,8 +21,17 @@ public class Product {
     @Column(name = "name")
     private String productName;
 
+    @Column(name = "category")
+    private String productCategory;
+
     @Column(name = "price")
     private int productPriceCent;
+
+    @Column(name = "imageURL")
+    private String productImageURL;
+
+    @OneToMany(mappedBy = "cartItemProduct",cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CartItem> cartItems;
 
     public String getProductName() {
         return productName;
@@ -32,6 +41,14 @@ public class Product {
         this.productName = productName;
     }
 
+    public String getProductCategory() {
+        return productCategory;
+    }
+
+    public void setProductCategory(String productCategory) {
+        this.productCategory = productCategory;
+    }
+
     public int getProductPriceCent() {
         return productPriceCent;
     }
@@ -39,20 +56,12 @@ public class Product {
     public void setProductPriceCent(int productPriceCent) {
         this.productPriceCent = productPriceCent;
     }
-//    @Column(name = "image")
-//    private String productImage;
 
-    @OneToMany(mappedBy = "cartItemProduct",cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CartItem> cartItems;
+    public String getProductImageURL() {
+        return productImageURL;
+    }
 
-//    private int priceCent;
-//
-//    public Double getPriceInRubles() {
-//        return priceCent / 100.0;
-//    }
-//
-//    // Удобный метод для установки цены в рублях
-//    public void setPriceInRubles(Double priceInRubles) {
-//        this.priceCent = (int) Math.round(priceInRubles * 100);
-//    }
+    public void setProductImageURL(String productImageURL) {
+        this.productImageURL = productImageURL;
+    }
 }

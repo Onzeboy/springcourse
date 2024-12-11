@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,6 +13,8 @@
         <ul>
             <li><a href="#">Link 1</a></li>
             <li><a href="#">Link 2</a></li>
+            <li sec:authorize="isAuthenticated()"><a href="/logout">Logout</a></li>
+            <li sec:authorize="!isAuthenticated()"><a href="/login">Login</a></li>
         </ul>
     </nav>
 </header>
@@ -26,9 +28,14 @@
             <p class="product-name" th:text="${product.productName}">Product Name</p>
             <div class="product-price-cart">
                 <p class="product-price" th:text="${product.productPriceCent}">Product Price</p>
-                <a href="#" class="add-to-cart">
-                    <img src="img/icons8-тележка-из-магазина-64.png" alt="Add to Cart">
-                </a>
+                <div sec:authorize="isAuthenticated()">
+                    <a href="#" class="add-to-cart">
+                        <img src="img/icons8-тележка-из-магазина-64.png" alt="Add to Cart">
+                    </a>
+                </div>
+                <div sec:authorize="!isAuthenticated()">
+                    <p>Please <a href="/login">login</a> to add to cart.</p>
+                </div>
             </div>
         </div>
     </div>
