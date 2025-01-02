@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security6">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,14 +7,26 @@
     <link rel="stylesheet" href="css/mainpagee.css">
 </head>
 <body>
+
 <header>
     <div class="logo">Logo</div>
     <nav>
         <ul>
             <li><a href="#">Link 1</a></li>
             <li><a href="#">Link 2</a></li>
-            <li sec:authorize="isAuthenticated()"><a href="/logout">Logout</a></li>
-            <li sec:authorize="!isAuthenticated()"><a href="/login">Login</a></li>
+
+            <!-- Показать "Logout" для аутентифицированных пользователей -->
+            <li sec:authorize="isAuthenticated()">
+                <a href="/logout" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</a>
+                <form id="logout-form" th:action="@{/logout}" method="post" style="display: none;">
+                    <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
+                </form>
+            </li>
+
+            <!-- Показать "Login" для гостей -->
+            <li sec:authorize="!isAuthenticated()">
+                <a href="/login">Login</a>
+            </li>
         </ul>
     </nav>
 </header>
@@ -28,18 +40,16 @@
             <p class="product-name" th:text="${product.productName}">Product Name</p>
             <div class="product-price-cart">
                 <p class="product-price" th:text="${product.productPriceCent}">Product Price</p>
-                <div sec:authorize="isAuthenticated()">
+                <div sec:authorize="hasRole('USER')">
                     <a href="#" class="add-to-cart">
                         <img src="img/icons8-тележка-из-магазина-64.png" alt="Add to Cart">
                     </a>
-                </div>
-                <div sec:authorize="!isAuthenticated()">
-                    <p>Please <a href="/login">login</a> to add to cart.</p>
                 </div>
             </div>
         </div>
     </div>
 </main>
+
 <footer class="footer">
     <button id="load-more" data-page="1" data-size="12">Load More</button>
 </footer>

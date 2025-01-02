@@ -4,7 +4,10 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Collection;
 import java.util.List;
 
 @NoArgsConstructor
@@ -12,7 +15,7 @@ import java.util.List;
 @Table(name = "users") // Имя таблицы в БД
 @Entity
 @Data
-    public class User {
+    public class User implements UserDetails {
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         @Column(name = "id")
@@ -30,9 +33,8 @@ import java.util.List;
         @Column(name = "password", nullable = false)
         private String userPassword;
 
-        @ManyToOne(fetch = FetchType.LAZY)
-        @JoinColumn(name = "userRoleId")
-        private Role userRole;
+        @Enumerated(EnumType.STRING)
+        private Role role;
 
         @OneToMany(mappedBy = "cartUser", cascade = CascadeType.ALL, orphanRemoval = true)
         private List<Cart> carts;
@@ -48,8 +50,33 @@ import java.util.List;
                 ", userEmail='" + userEmail + '\'' +
                 ", userPhoneNumber='" + userPhoneNumber + '\'' +
                 ", userName='" + userName + '\'' +
-                ", userRole=" + userRole +
+                ", userRole=" + role +
                 '}';
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of();
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return UserDetails.super.isAccountNonExpired();
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return UserDetails.super.isAccountNonLocked();
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return UserDetails.super.isCredentialsNonExpired();
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return UserDetails.super.isEnabled();
     }
 
     public String getUserEmail() {
@@ -84,14 +111,6 @@ import java.util.List;
         this.userPassword = userPassword;
     }
 
-    public Role getUserRole() {
-        return userRole;
-    }
-
-    public void setUserRole(Role userRole) {
-        this.userRole = userRole;
-    }
-
     public List<Cart> getCarts() {
         return carts;
     }
@@ -107,8 +126,22 @@ import java.util.List;
     public void setOrderTables(List<OrderTable> orderTables) {
         this.orderTables = orderTables;
     }
+    public Role getRole() {
+        return role;
+    }
 
-    public void setUserRole(String user) {
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    @Override
+    public String getPassword() {
+        return null;
+    }
+
+    @Override
+    public String getUsername() {
+        return null;
     }
 }
 

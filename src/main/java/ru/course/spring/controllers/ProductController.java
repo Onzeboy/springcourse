@@ -3,6 +3,8 @@ package ru.course.spring.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +24,8 @@ public class ProductController {
     public String getProducts(@RequestParam(defaultValue = "0") int page,
                               @RequestParam(defaultValue = "12") int size,
                               Model model) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("Is Authenticated: " + authentication.isAuthenticated());
         Page<Product> productPage = productService.getProducts(page, size);
         model.addAttribute("products", productPage.getContent());
         model.addAttribute("currentPage", page);

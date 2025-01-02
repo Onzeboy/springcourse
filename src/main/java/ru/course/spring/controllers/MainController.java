@@ -6,6 +6,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import ru.course.spring.pojo.Role;
 import ru.course.spring.pojo.User;
 import ru.course.spring.services.UserService;
 
@@ -37,6 +38,7 @@ public class MainController {
         user.setUserPassword(password);
         user.setUserEmail(email);
         user.setUserPhoneNumber(phoneNumber);
+        user.setRole(Role.valueOf("ROLE_USER"));
         userService.save(user);
         return "redirect:/login";
     }
