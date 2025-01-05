@@ -65,11 +65,6 @@ nav ul li a {
     align-items: center;
     text-align: center;
     padding: 10px;
-    transition: box-shadow 0.3s ease; /* Переход для тени */
-}
-
-.product-box:hover {
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Тень при наведении */
 }
 
 .product-image, .product-info {
@@ -198,6 +193,52 @@ img:focus, img:active {
     outline: none;
     border: none;
     background: none;
+}
+.product-quantity {
+    font-size: 14px; /* Размер шрифта */
+    margin: 0; /* Убираем отступы */
+    padding: 0 10px; /* Добавляем отступы слева и справа */
+    text-align: left; /* Выравнивание текста по левому краю */
+    width: 100%; /* Ширина блока */
+}
+.quantity-and-cart {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Расстояние между пикером и кнопкой */
+    margin-left: auto; /* Прижимаем к правому краю */
+}
+
+.quantity-picker {
+    width: 40px; /* Уменьшенная ширина */
+    padding: 3px; /* Компактные отступы */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    text-align: center; /* Центровка текста */
+    font-size: 12px; /* Минимальный размер текста */
+    background-color: #f9f9f9; /* Светлый фон */
+}
+
+.quantity-picker:focus {
+    outline: 1px solid #007bff; /* Голубая рамка при фокусе */
+}
+
+.add-to-cart img {
+    width: 20px; /* Уменьшенный размер иконки */
+    height: 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.add-to-cart:hover img {
+    transform: scale(1.1); /* Незначительное увеличение при наведении */
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2); /* Легкая тень при наведении */
+}
+
+.product-price-cart {
+    display: flex;
+    justify-content: space-between; /* Распределение пространства */
+    align-items: center; /* Центровка элементов по вертикали */
+    width: 100%;
+    padding: 0 10px;
 }
 
 @media (max-width: 900px) {

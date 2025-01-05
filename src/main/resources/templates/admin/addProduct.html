@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Добавление товара</title>
+    <link rel="stylesheet" href="css/addproduct.css"> <!-- Подключаем ваш CSS -->
+</head>
+<body>
+<div class="container">
+    <div class="product-box">
+        <form class="product-form" th:action="@{/addproduct}" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="productName">Название</label>
+                <input type="text" id="productName" name="productName" placeholder="Введите название" required>
+            </div>
+            <div class="form-group">
+                <label for="productDescription">Описание</label>
+                <textarea id="productDescription" name="productDescription" placeholder="Введите описание" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="productCategory">Категория</label>
+                <select id="productCategory" name="productCategory" required>
+                    <option th:each="category : ${categories}"
+                            th:value="${category.name()}"
+                            th:text="${category.displayName}">
+                    </option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="productPriceCent">Цена</label>
+                <input
+                        type="text"
+                        id="productPriceCent"
+                        name="productPriceCent"
+                        placeholder="Введите цену (например: 10.50)"
+                        required
+                        pattern="^\d{1,5}\.\d{2}$"
+                        title="Цена должна быть в формате xx.xx (например: 10.50)">
+            </div>
+            <div class="form-group">
+                <label for="productQuantity">Количество</label>
+                <input type="text" id="productQuantity" name="productQuantity" placeholder="Введите количество" required oninput="validateQuantity(this)">
+            </div>
+            <div class="form-group">
+                <label for="imageFile">Изображение</label>
+                <input type="file" id="imageFile" name="imageFile" accept="image/*" required onchange="previewImage(event)">
+            </div>
+            <!-- Контейнер для предпросмотра изображения -->
+            <div id="imagePreviewContainer" class="image-preview-container" style="display: none;">
+                <img id="imagePreview" alt="Предпросмотр изображения" />
+            </div>
+            <button type="submit">Добавить товар</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const priceInput = document.getElementById('productPriceCent');
+
+        // Ограничение ввода только формата xx.xx
+        priceInput.addEventListener('input', (event) => {
+            let value = priceInput.value;
+
+            // Убираем всё, кроме цифр и точки
+            value = value.replace(/[^0-9.]/g, '');
+
+            // Проверяем наличие более одной точки
+            const parts = value.split('.');
+            if (parts.length > 2) {
+                value = parts[0] + '.' + parts[1]; // Убираем лишние точки
+            }
+
+            // Ограничиваем до двух цифр после точки
+            if (parts[1] && parts[1].length > 2) {
+                value = parts[0] + '.' + parts[1].substring(0, 2);
+            }
+
+            // Обновляем значение в поле ввода
+            priceInput.value = value;
+        });
+
+        // Конвертируем цену в формат xxxx перед отправкой формы
+        const form = document.querySelector('form');
+        form.addEventListener('submit', (event) => {
+            const value = priceInput.value;
+            const isValid = /^\d{1,5}\.\d{2}$/.test(value); // Формат xx.xx с фиксированными двумя цифрами после точки
+
+            if (!isValid) {
+                alert('Введите цену в формате xx.xx, например, 10.50');
+                event.preventDefault(); // Отменяем отправку формы
+                return;
+            }
+
+            // Преобразование цены из xx.xx в xxxx
+            const numericValue = parseFloat(value) * 100; // Умножаем на 100
+            priceInput.value = Math.round(numericValue); // Округляем и записываем обратно
+        });
+    });
+
+    // Ограничение ввода только чисел для количества
+    function validateQuantity(input) {
+        input.value = input.value.replace(/\D/g, ''); // Убираем всё, кроме чисел
+    }
+
+    // Предпросмотр изображения
+    function previewImage(event) {
+        const input = event.target;
+        const previewContainer = document.getElementById('imagePreviewContainer');
+        const previewImage = document.getElementById('imagePreview');
+
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                previewImage.src = e.target.result;
+                previewContainer.style.display = 'block';
+                previewImage.style.maxWidth = '100%';
+                previewImage.style.maxHeight = '200px';
+            };
+            reader.readAsDataURL(input.files[0]);
+        } else {
+            previewContainer.style.display = 'none';
+        }
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,98 @@
+/* Базовые стили для body */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center; /* Центрируем по горизонтали */
+    align-items: center; /* Центрируем по вертикали */
+    min-height: 100vh; /* Высота окна браузера */
+    background-color: #f5f5f5; /* Светлый фон страницы */
+    box-sizing: border-box;
+}
+
+/* Контейнер формы */
+.center-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%; /* Растягиваем контейнер */
+}
+
+/* Форма */
+.form-container {
+    background-color: #ffffff; /* Белый фон формы */
+    padding: 30px; /* Внутренние отступы */
+    border-radius: 10px; /* Скруглённые углы */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Тень вокруг формы */
+    width: 100%;
+    max-width: 400px; /* Ограничиваем ширину формы */
+    text-align: center; /* Центрируем заголовок */
+}
+
+.form-container h2 {
+    margin-bottom: 20px; /* Отступ между заголовком и формой */
+    font-size: 20px;
+    color: #333;
+}
+
+/* Поля ввода */
+.form-group {
+    margin-bottom: 15px; /* Отступ между элементами */
+    text-align: left; /* Выравниваем метки по левому краю */
+}
+
+.form-group label {
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+    display: block; /* Метка занимает всю ширину */
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%; /* Поля занимают всю ширину формы */
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px; /* Скруглённые углы */
+    background-color: #f9f9f9;
+    box-sizing: border-box;
+}
+
+.form-group textarea {
+    resize: vertical; /* Позволяем изменение размера только по вертикали */
+    min-height: 80px;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: #007BFF; /* Синий акцент при фокусе */
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.2);
+}
+
+/* Кнопка */
+button {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    color: #ffffff;
+    background-color: #28a745;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+    background-color: #218838;
+    transform: translateY(-2px); /* Лёгкий эффект подъёма */
+}
+
+button:active {
+    background-color: #1e7e34;
+    transform: translateY(0); /* Убираем эффект подъёма */
+}

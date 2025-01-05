@@ -36,12 +36,27 @@ import java.util.List;
         @Enumerated(EnumType.STRING)
         private Role role;
 
-        @OneToMany(mappedBy = "cartUser", cascade = CascadeType.ALL, orphanRemoval = true)
-        private List<Cart> carts;
-
         @OneToMany(mappedBy = "orderTableUser", cascade = CascadeType.ALL, orphanRemoval = true)
         private List<OrderTable> orderTables;
 
+    @OneToMany(mappedBy = "cartItemUser", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CartItem> cartItems;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public List<CartItem> getCartItems() {
+        return cartItems;
+    }
+
+    public void setCartItems(List<CartItem> cartItems) {
+        this.cartItems = cartItems;
+    }
 
     @Override
     public String toString() {
@@ -111,13 +126,6 @@ import java.util.List;
         this.userPassword = userPassword;
     }
 
-    public List<Cart> getCarts() {
-        return carts;
-    }
-
-    public void setCarts(List<Cart> carts) {
-        this.carts = carts;
-    }
 
     public List<OrderTable> getOrderTables() {
         return orderTables;
