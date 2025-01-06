@@ -82,16 +82,6 @@ public class ProductController {
             System.out.println("Тип данных в productImageData: " + product.getProductImageData().getClass().getName());
             System.out.println("Размер productImageData: " + (product.getProductImageData() != null ? product.getProductImageData().length : "null"));
             productRepository.save(product);
-            // Вызов репозитория
-//            productRepository.insertProduct(
-//                    product.getProductCategory().name(),       // category
-//                    product.getProductDescription(),          // description
-//                    product.getProductImageData(),            // imageData
-//                    product.getProductName(),                 // name
-//                    product.getProductPriceCent(),            // price
-//                    product.getProductQuantity()              // quantity
-//            );
-
             model.addAttribute("successMessage", "Товар успешно добавлен!");
         } catch (IOException e) {
             model.addAttribute("errorMessage", "Ошибка при сохранении изображения. Попробуйте снова.");

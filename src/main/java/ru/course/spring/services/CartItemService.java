@@ -9,6 +9,8 @@ import ru.course.spring.repository.CartItemRepository;
 import ru.course.spring.repository.ProductRepository;
 import ru.course.spring.repository.UserRepository;
 
+import java.util.List;
+
 @Service
 public class CartItemService {
 
@@ -20,6 +22,7 @@ public class CartItemService {
 
     @Autowired
     private UserRepository userRepository;
+
     public void addToCart(Long productId, int quantity, int price, Long id) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("Продукт не найден: " + productId));
@@ -31,5 +34,13 @@ public class CartItemService {
         User user = userRepository.getUserById(id);
         cartItem.setCartItemUser(user);
         cartItemRepository.save(cartItem); // Сохраняем в корзину
+    }
+
+    public List<CartItem> getCartItems(Long id) {
+        return cartItemRepository.getCartItemsByUserId(id);
+    }
+
+    public void removeItemFromCart(Long itemId) {
+        cartItemRepository.deleteById(itemId);
     }
 }
