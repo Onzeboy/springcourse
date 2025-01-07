@@ -1,18 +1,23 @@
 package ru.course.spring.controllers;
 
 import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import ru.course.spring.pojo.User;
+import ru.course.spring.services.UserService;
 
 import java.security.Principal;
 import java.util.*;
 
 @Controller
 public class UserController {
+
+    @Autowired
+    private UserService userService;
 
     // Отображение списка пользователей
     @GetMapping("/users")
@@ -21,7 +26,7 @@ public class UserController {
         String currentUserEmail = principal.getName();
         // Предполагаем, что UserService имеет метод для получения пользователя по email
         // Можно добавить такой метод или изменить существующий
-        Optional<User> currentUserOpt = userService.getUserByEmail(currentUserEmail);
+        Optional<User> currentUserOpt = Optional.ofNullable(userService.findByUserEmail(currentUserEmail));
         if (!currentUserOpt.isPresent()) {
             // Обработка случая, когда текущий пользователь не найден
             return "redirect:/login";
@@ -36,19 +41,14 @@ public class UserController {
 
     // Обработка формы редактирования пользователя
     @PostMapping("/users/edit")
-    public String editUser(@RequestParam("id") Long id,
-                           @RequestParam("username") String username,
-                           @RequestParam("email") String email,
-                           @RequestParam(value = "roles", required = false) List<String> roles,
-                           Model model) {
-        Set<String> rolesSet = roles != null ? new HashSet<>(roles) : new HashSet<>();
-        try {
-            userService.updateUser(id, username, email, rolesSet);
-            model.addAttribute("successMessage", "Пользователь успешно обновлен.");
-        } catch (Exception e) {
-            model.addAttribute("errorMessage", e.getMessage());
-        }
-        return "redirect:/admin/users";
+    public String editUser(
+            @RequestParam("id") Long id,
+            @RequestParam("username") String username,
+            @RequestParam("email") String email,
+            @RequestParam("phone_number") String phone,
+            @RequestParam("role") String roleString  // один параметр для единственной роли
+    ) {
+        userService.updateUser(id, username, phone, email, roleString);
+        return "redirect:/users";
     }
-
 }

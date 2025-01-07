@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Управление пользователями</title>
+    <link rel="stylesheet" href="/css/admin.css"> <!-- Добавьте стили по необходимости -->
+    <!-- Bootstrap CSS для упрощения стилизации -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+    <h1>Управление пользователями</h1>
+
+    <!-- Сообщения об успехе или ошибке -->
+    <div th:if="${successMessage}" class="alert alert-success" role="alert">
+        <p th:text="${successMessage}"></p>
+    </div>
+    <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+        <p th:text="${errorMessage}"></p>
+    </div>
+
+    <!-- Таблица пользователей -->
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Имя пользователя</th>
+            <th>Email</th>
+            <th>Номер телефона</th>
+            <th>Роли</th>
+            <th>Действия</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="user : ${users}">
+            <td th:text="${user.id}">1</td>
+            <td th:text="${user.userName}">John Doe</td>
+            <td th:text="${user.userEmail}">john@example.com</td>
+            <td th:text="${user.userPhoneNumber}">+123456789</td>
+            <td th:text="${#strings.arrayJoin(user.role, ', ')}">ROLE_USER</td> <!-- Отображение ролей через запятую -->
+            <td>
+                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                        data-bs-target="#editUserModal"
+                        th:data-id="${user.id}"
+                        th:data-username="${user.userName}"
+                        th:data-email="${user.userEmail}"
+                        th:data-phone_number="${user.userPhoneNumber}"
+                        th:data-roles="${user.role}">
+                    Редактировать
+                </button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Модальное окно для редактирования пользователя -->
+<div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form th:action="@{users/edit}" method="post">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editUserModalLabel">Редактировать пользователя</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="id" id="edit-user-id" th:value="0" />
+                    <div class="mb-3">
+                        <label for="edit-username" class="form-label">Имя пользователя</label>
+                        <input type="text" class="form-control" id="edit-username" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="edit-email" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-phone_number" class="form-label">Номер телефона</label>
+                        <input type="tel" class="form-control" id="edit-phone_number" name="phone_number" pattern="^\+?[0-9\s\-()]*$" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Роли</label>
+                        <div th:each="role : ${rolesList}">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio"
+                                       th:id="'role-' + ${role}"
+                                       name="role"
+                                       th:value="${role}">
+                                <label class="form-check-label" th:for="'role-' + ${role}" th:text="${role}">ROLE_USER</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Bootstrap JS и зависимости -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- JavaScript для заполнения модального окна данными пользователя -->
+<script>
+    var editUserModal = document.getElementById('editUserModal');
+    editUserModal.addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget;
+        var userId = button.getAttribute('data-id');
+        var username = button.getAttribute('data-username');
+        var email = button.getAttribute('data-email');
+        var phone = button.getAttribute('data-phone_number');
+        var roles = button.getAttribute('data-roles').split(', ');
+
+        // Обновление полей в модальном окне
+        var modal = this;
+        modal.querySelector('#edit-user-id').value = userId;
+        modal.querySelector('#edit-username').value = username;
+        modal.querySelector('#edit-email').value = email;
+        modal.querySelector('#edit-phone_number').value = phone;
+
+        // Сброс всех чекбоксов
+        var checkboxes = modal.querySelectorAll('input[type="checkbox"][name="roles"]');
+        checkboxes.forEach(function(checkbox) {
+            checkbox.checked = false;
+        });
+
+        // Установка чекбоксов в соответствии с ролями пользователя
+        roles.forEach(function(role) {
+            var checkbox = modal.querySelector('input[type="checkbox"][value="' + role + '"]');
+            if (checkbox) {
+                checkbox.checked = true;
+            }
+        });
+    });
+</script>
+</body>
+</html>

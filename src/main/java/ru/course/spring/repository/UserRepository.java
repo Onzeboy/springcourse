@@ -7,6 +7,7 @@ import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Repository;
 import ru.course.spring.pojo.User;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -18,4 +19,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT u FROM User u WHERE u.id = :userID")
     User getUserById(@Param("userID") Long userID);
+
+    List<User> findAllByIdNot(Long id);
 }

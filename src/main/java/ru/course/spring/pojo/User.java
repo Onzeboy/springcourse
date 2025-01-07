@@ -24,7 +24,7 @@ import java.util.List;
         @Column(name = "email", nullable = false, unique = true)
         private String userEmail;
 
-        @Column(name = "phoneNumber")
+        @Column(name = "phone_number")
         private String userPhoneNumber;
 
         @Column(name = "username", nullable = false, unique = true)
