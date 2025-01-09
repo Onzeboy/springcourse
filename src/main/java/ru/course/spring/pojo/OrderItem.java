@@ -26,8 +26,48 @@ public class OrderItem {
     private Product orderItemProduct;
 
     @Column(name = "quantity", nullable = false)
-    private Integer orderItemQuantity;
+    private int orderItemQuantity;
 
     @Column(name = "price", nullable = false)
-    private Integer orderItemPrice;
+    private int orderItemPrice;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public OrderTable getOrderItemOrderTable() {
+        return orderItemOrderTable;
+    }
+
+    public void setOrderItemOrderTable(OrderTable orderItemOrderTable) {
+        this.orderItemOrderTable = orderItemOrderTable;
+    }
+
+    public Product getOrderItemProduct() {
+        return orderItemProduct;
+    }
+
+    public void setOrderItemProduct(Product orderItemProduct) {
+        this.orderItemProduct = orderItemProduct;
+    }
+
+    public int getOrderItemQuantity() {
+        return orderItemQuantity;
+    }
+
+    public void setOrderItemQuantity(int orderItemQuantity) {
+        this.orderItemQuantity = orderItemQuantity;
+    }
+
+    public int getOrderItemPrice() {
+        return orderItemPrice;
+    }
+
+    public void setOrderItemPrice(int orderItemPrice) {
+        this.orderItemPrice = orderItemPrice;
+    }
 }
