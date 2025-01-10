@@ -30,17 +30,17 @@ public class SecurityConfig {
                 .csrf().disable()
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/moderator/**").hasRole("MODERATOR")
                         .requestMatchers("/user/**").hasRole("USER")
                         .anyRequest().permitAll()
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
                         .defaultSuccessUrl("/products", true)
-                        .failureUrl("/login-error")
+                        .failureUrl("/login?error=true")
                         .permitAll()
                 )
-                .logout(withDefaults());
+                .exceptionHandling(ex -> ex.accessDeniedPage("/403"));
+                http.logout(withDefaults());
 
         return http.build();
     }

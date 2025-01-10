@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Подробности заказа</title>
+    <link rel="stylesheet" th:href="@{/css/cartpage.css}">
+    <style>
+        /* Стили для секции с подробностями заказа */
+        .order-details-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .order-details-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .order-info {
+            margin-bottom: 20px;
+        }
+
+        .order-info p {
+            margin: 5px 0;
+        }
+
+        .product-list {
+            margin-top: 20px;
+        }
+
+        .product-list table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .product-list th,
+        .product-list td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .product-list th {
+            background-color: #f4f4f4;
+        }
+
+        .footer-content {
+            text-align: right;
+            margin-top: 20px;
+        }
+
+        .back-button {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<!-- Хедер -->
+<header>
+    <div class="header-content">
+        <h1>Подробности заказа</h1>
+        <nav>
+            <ul class="nav-links">
+                <li><a th:href="@{/}">Главная</a></li>
+                <li><a th:href="@{/user/orderHistory}">История заказов</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<!-- Подробности заказа -->
+<main>
+    <div class="order-details-container">
+        <div class="order-details-header">
+            <h2>Заказ №<span th:text="${order.id}"></span></h2>
+        </div>
+        <div class="order-info">
+            <p><strong>Дата заказа:</strong> <span th:text="${order.formattedDate}"></span></p>
+            <p><strong>Адрес доставки:</strong>
+                <span th:text="${order.orderTableCity} + ', ' + ${order.orderTableStreet} + ' ' + ${order.orderTableHome}"></span>
+            </p>
+            <p><strong>Итоговая сумма:</strong> <span th:text="${#numbers.formatDecimal(order.orderTableTotalPrice / 100.0, 0, 2)} + ' ₽'"></span></p>
+        </div>
+
+        <!-- Список продуктов -->
+        <div class="product-list">
+            <h3>Товары в заказе</h3>
+            <table>
+                <thead>
+                <tr>
+                    <th>Название</th>
+                    <th>Количество</th>
+                    <th>Цена</th>
+                    <th>Итого</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="product : ${orderItem}">
+                    <td th:text="${product.orderItemProductHistory.productName}">Название</td>
+                    <td th:text="${product.orderItemQuantity}">1</td>
+                    <td th:text="${#numbers.formatDecimal(product.orderItemProductHistory.productPriceCent / 100.0, 0, 2)} + ' ₽'">100 ₽</td>
+                    <td th:text="${#numbers.formatDecimal(product.orderItemQuantity * product.orderItemProductHistory.productPriceCent / 100.0, 0, 2)} + ' ₽'">100 ₽</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+</body>
+</html>

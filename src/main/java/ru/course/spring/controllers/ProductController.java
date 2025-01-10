@@ -7,6 +7,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.course.spring.pojo.Product;
@@ -18,7 +19,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Base64;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -31,62 +32,165 @@ public class ProductController {
     private ProductService productService;
 
     @GetMapping("/products")
-    public String getProducts(@RequestParam(defaultValue = "0") int page,
-                              @RequestParam(defaultValue = "12") int size,
-                              Model model) {
+    public String getProducts(Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         System.out.println("Is Authenticated: " + authentication.isAuthenticated());
-        Page<Product> productPage = productService.getProducts(page, size);
+        List<Product> productPage = productService.getProducts();
 
         // Преобразование продуктов с изображениями в формат Base64
-        productPage.getContent().forEach(product -> {
+        productPage.forEach(product -> {
             if (product.getProductImageData() != null) {
                 String base64Image = Base64.getEncoder().encodeToString(product.getProductImageData());
                 product.setBase64Image("data:image/jpeg;base64," + base64Image);
             }
         });
 
-        model.addAttribute("products", productPage.getContent());
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", productPage.getTotalPages());
-        model.addAttribute("totalItems", productPage.getTotalElements());
-        model.addAttribute("size", size);
-        return "mainPage";
+        model.addAttribute("products", productPage);;
+        return "/mainPage";
     }
 
-    @GetMapping("/products/loadMore")
-    @ResponseBody
-    public Page<Product> loadMoreProducts(@RequestParam(defaultValue = "0") int page,
-                                          @RequestParam(defaultValue = "12") int size) {
-        return productService.getProducts(page, size);
-    }
-    @GetMapping("/add")
+    @GetMapping("/admin/add")
     public String showAddProductForm(Model model) {
         model.addAttribute("categories", ProductCategory.values());
         model.addAttribute("product", new Product());
-        return "admin/addProduct";
+        return "/admin/addProduct";
     }
 
-    @PostMapping("/addproduct")
+    @PostMapping("/admin/addproduct")
     public String addProduct(
             @ModelAttribute Product product,
             @RequestParam("imageFile") MultipartFile imageFile,
             Model model) {
+        // Определите допустимые типы контента
+        List<String> allowedContentTypes = Arrays.asList("image/jpeg", "image/png", "image/gif");
+
+        // Максимальный допустимый размер файла (например, 5 МБ)
+        long maxFileSize = 5 * 1024 * 1024; // 5 МБ
+
         try {
             if (!imageFile.isEmpty()) {
-                byte[] imageData = imageFile.getBytes(); // Преобразуем файл в массив байтов
-                product.setProductImageData(imageData); // Сохраняем массив байтов в объекте
+                String contentType = imageFile.getContentType();
+                String originalFilename = StringUtils.cleanPath(imageFile.getOriginalFilename());
+
+                // Проверка типа файла
+                if (!allowedContentTypes.contains(contentType)) {
+                    model.addAttribute("errorMessage", "Недопустимый тип изображения. Разрешены только JPEG, PNG и GIF.");
+                    return "redirect:/admin/add"; // Перенаправление на страницу добавления с ошибкой
+                }
+
+                // Проверка размера файла
+                if (imageFile.getSize() > maxFileSize) {
+                    model.addAttribute("errorMessage", "Размер изображения превышает 5 МБ.");
+                    return "redirect:/admin/add"; // Перенаправление на страницу добавления с ошибкой
+                }
+
+                // Дополнительная проверка расширения файла (опционально)
+                String fileExtension = StringUtils.getFilenameExtension(originalFilename);
+                if (fileExtension == null ||
+                        (!fileExtension.equalsIgnoreCase("jpg") &&
+                                !fileExtension.equalsIgnoreCase("jpeg") &&
+                                !fileExtension.equalsIgnoreCase("png") &&
+                                !fileExtension.equalsIgnoreCase("gif"))) {
+                    model.addAttribute("errorMessage", "Недопустимое расширение файла изображения.");
+                    return "redirect:/admin/add"; // Перенаправление на страницу добавления с ошибкой
+                }
+
+                // Преобразуем файл в массив байтов и сохраняем
+                byte[] imageData = imageFile.getBytes();
+                product.setProductImageData(imageData);
+            } else {
+                model.addAttribute("errorMessage", "Пожалуйста, загрузите изображение продукта.");
+                 return "redirect:/admin/add";
             }
 
             // Отладочная информация
-            System.out.println("Тип данных в productImageData: " + product.getProductImageData().getClass().getName());
-            System.out.println("Размер productImageData: " + (product.getProductImageData() != null ? product.getProductImageData().length : "null"));
+            if (product.getProductImageData() != null) {
+                System.out.println("Тип данных в productImageData: " + product.getProductImageData().getClass().getName());
+                System.out.println("Размер productImageData: " + product.getProductImageData().length);
+            } else {
+                System.out.println("Изображение не загружено.");
+            }
+
+            // Сохранение продукта в репозитории
             productRepository.save(product);
             model.addAttribute("successMessage", "Товар успешно добавлен!");
+
         } catch (IOException e) {
             model.addAttribute("errorMessage", "Ошибка при сохранении изображения. Попробуйте снова.");
             e.printStackTrace();
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", "Произошла неизвестная ошибка. Попробуйте позже.");
+            e.printStackTrace();
         }
-        return "admin/addProduct";
+
+        return "redirect:/admin/add";
     }
+
+    @PostMapping("/admin/editProduct")
+    public String editProduct(
+            @RequestParam("productId") Long productId,
+            @RequestParam("name") String name,
+            @RequestParam("description") String description,
+            @RequestParam("quantity") Integer quantity,
+            @RequestParam("price") Integer price,
+            Model model
+    ) {
+        try {
+            // Поиск продукта по ID
+            Product product = productRepository.findById(productId)
+                    .orElseThrow(() -> new IllegalArgumentException("Продукт не найден: " + productId));
+
+            // Обновление полей продукта
+            product.setProductName(name);
+            product.setProductDescription(description);
+            product.setProductQuantity(quantity);
+            product.setProductPriceCent(price);
+
+            // Сохранение изменений
+            productRepository.save(product);
+
+            // Добавление сообщения в модель
+            model.addAttribute("message", "Продукт успешно обновлен!");
+
+            return "redirect:/products"; // Перенаправление на страницу продуктов
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("error", e.getMessage());
+            return "redirect:/products"; // Перенаправление на страницу продуктов с ошибкой
+        } catch (Exception e) {
+            model.addAttribute("error", "Ошибка при обновлении продукта: " + e.getMessage());
+            return "redirect:/products"; // Перенаправление на страницу продуктов с ошибкой
+        }
+    }
+
+    /**
+     * Обрабатывает запрос на удаление продукта.
+     * URL: /products/deleteProduct
+     * Метод: POST
+     */
+    @PostMapping("/admin/deleteProduct")
+    public String deleteProduct(
+            @RequestParam("productId") Long productId,
+            Model model
+    ) {
+        try {
+            // Поиск продукта по ID
+            Product product = productRepository.findById(productId)
+                    .orElseThrow(() -> new IllegalArgumentException("Продукт не найден: " + productId));
+
+            // Удаление продукта
+            productRepository.delete(product);
+
+            // Добавление сообщения в модель
+            model.addAttribute("message", "Продукт успешно удален!");
+
+            return "redirect:/products"; // Перенаправление на страницу продуктов
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("error", e.getMessage());
+            return "redirect:/products"; // Перенаправление на страницу продуктов с ошибкой
+        } catch (Exception e) {
+            model.addAttribute("error", "Ошибка при удалении продукта: " + e.getMessage());
+            return "redirect:/products"; // Перенаправление на страницу продуктов с ошибкой
+        }
+    }
+
 }

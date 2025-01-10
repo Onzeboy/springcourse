@@ -38,6 +38,10 @@ public class OrderTable {
     @Column(name = "totalPrice", nullable = false)
     private int orderTableTotalPrice;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private OrderStatus orderStatus;
+
     @OneToMany(mappedBy = "orderItemOrderTable",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> OrderItems;
 
@@ -103,5 +107,25 @@ public class OrderTable {
 
     public void setOrderItems(List<OrderItem> orderItems) {
         OrderItems = orderItems;
+    }
+
+    public OrderStatus getOrderStatus() {
+        return orderStatus;
+    }
+
+    public void setOrderStatus(OrderStatus orderStatus) {
+        this.orderStatus = orderStatus;
+    }
+
+
+    @Transient // Чтобы Hibernate не пытался сохранить это поле в БД
+    private String formattedDate;
+
+    public String getFormattedDate() {
+        return formattedDate;
+    }
+
+    public void setFormattedDate(String formattedDate) {
+        this.formattedDate = formattedDate;
     }
 }

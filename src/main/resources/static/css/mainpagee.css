@@ -67,23 +67,10 @@ nav ul li a {
     padding: 10px;
 }
 
-.product-image, .product-info {
+.product-info {
     width: 100%; /* Ширина 100% */
     padding: 10px; /* Одинаковые отступы */
     box-sizing: border-box; /* Включаем отступы в размеры */
-}
-
-.product-image {
-    background-color: #ffffff; /* Белый фон для блока изображения */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.product-image img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain; /* Вписываем изображение в контейнер */
 }
 
 .product-info {
@@ -194,7 +181,14 @@ img:focus, img:active {
     border: none;
     background: none;
 }
-.product-quantity {
+.product-quantity{
+    font-size: 14px; /* Размер шрифта */
+    margin: 0; /* Убираем отступы */
+    padding: 0 10px; /* Добавляем отступы слева и справа */
+    text-align: left; /* Выравнивание текста по левому краю */
+    width: 100%; /* Ширина блока */
+}
+.product-desc{
     font-size: 14px; /* Размер шрифта */
     margin: 0; /* Убираем отступы */
     padding: 0 10px; /* Добавляем отступы слева и справа */
@@ -221,18 +215,40 @@ img:focus, img:active {
 .quantity-picker:focus {
     outline: 1px solid #007bff; /* Голубая рамка при фокусе */
 }
+.product-image {
+    width: 150px; /* Ширина контейнера */
+    height: 150px; /* Высота контейнера */
+    overflow: hidden; /* Обрезает содержимое, выходящее за пределы контейнера */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
+.scaled-image {
+    width: 100%; /* Масштабирование по ширине */
+    height: auto; /* Сохранение соотношения сторон */
+    object-fit: cover; /* Обрезает изображение, чтобы заполнить контейнер, сохраняя пропорции */
+}
 .add-to-cart img {
     width: 20px; /* Уменьшенный размер иконки */
     height: 20px;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
+.product-image {
+    width: 250px; /* Фиксированная ширина */
+    height: 200px; /* Фиксированная высота */
+    overflow: hidden; /* Обрезает изображение, если оно выходит за пределы контейнера */
+}
 
+.compressed-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Уменьшает изображение, чтобы оно уместилось в контейнере, сохраняя пропорции */
+}
 .add-to-cart:hover img {
     transform: scale(1.1); /* Незначительное увеличение при наведении */
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.2); /* Легкая тень при наведении */
 }
-
 .product-price-cart {
     display: flex;
     justify-content: space-between; /* Распределение пространства */

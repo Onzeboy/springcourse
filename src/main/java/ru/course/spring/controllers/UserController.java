@@ -7,6 +7,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.course.spring.pojo.User;
 import ru.course.spring.services.UserService;
 
@@ -20,7 +21,7 @@ public class UserController {
     private UserService userService;
 
     // Отображение списка пользователей
-    @GetMapping("/users")
+    @GetMapping("/admin/users")
     public String listUsers(Model model, Principal principal) {
         // Получаем ID текущего пользователя
         String currentUserEmail = principal.getName();
@@ -35,20 +36,28 @@ public class UserController {
 
         List<User> users = userService.getAllUsersExcept(currentUserId);
         model.addAttribute("users", users);
-        model.addAttribute("rolesList", Arrays.asList("ROLE_USER", "ROLE_ADMIN", "ROLE_MANAGER")); // Пример ролей
+        model.addAttribute("rolesList", Arrays.asList("ROLE_USER", "ROLE_ADMIN")); // Пример ролей
         return "admin/users"; // Шаблон Thymeleaf
     }
 
     // Обработка формы редактирования пользователя
-    @PostMapping("/users/edit")
+    @PostMapping("/admin/users/edit")
     public String editUser(
             @RequestParam("id") Long id,
             @RequestParam("username") String username,
             @RequestParam("email") String email,
             @RequestParam("phone_number") String phone,
-            @RequestParam("role") String roleString  // один параметр для единственной роли
+            @RequestParam("role") String roleString,
+            RedirectAttributes redirectAttributes // Для передачи сообщений об ошибках
     ) {
-        userService.updateUser(id, username, phone, email, roleString);
-        return "redirect:/users";
+        try {
+            userService.updateUser(id, username, phone, email, roleString);
+            redirectAttributes.addFlashAttribute("successMessage", "Пользователь успешно обновлён.");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Произошла ошибка при обновлении пользователя.");
+        }
+        return "redirect:/admin/users";
     }
 }

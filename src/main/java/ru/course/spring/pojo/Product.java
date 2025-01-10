@@ -23,13 +23,8 @@ public class Product {
     @Column(name = "name")
     private String productName;
 
-    @Enumerated(EnumType.STRING) // Хранение в БД как строка
-    @Column(name = "category")
-    private ProductCategory productCategory;
-
     @Column(name = "description")
     private String productDescription;
-
 
     @Column(name = "quantity")
     private int productQuantity;
@@ -58,14 +53,6 @@ public class Product {
 
     public void setProductPriceCent(int productPriceCent) {
         this.productPriceCent = productPriceCent;
-    }
-
-    public ProductCategory getProductCategory() {
-        return productCategory;
-    }
-
-    public void setProductCategory(ProductCategory productCategory) {
-        this.productCategory = productCategory;
     }
 
     public int getProductQuantity() {

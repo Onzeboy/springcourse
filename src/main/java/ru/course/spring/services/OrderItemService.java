@@ -5,14 +5,8 @@ import org.apache.juli.logging.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import ru.course.spring.pojo.CartItem;
-import ru.course.spring.pojo.OrderItem;
-import ru.course.spring.pojo.OrderTable;
-import ru.course.spring.pojo.User;
-import ru.course.spring.repository.CartItemRepository;
-import ru.course.spring.repository.OrderItemRepository;
-import ru.course.spring.repository.OrderTableRepository;
-import ru.course.spring.repository.UserRepository;
+import ru.course.spring.pojo.*;
+import ru.course.spring.repository.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,6 +18,9 @@ public class OrderItemService {
 
     @Autowired
     private CartItemRepository cartItemRepository;
+
+    @Autowired
+    private ProductHistoryRepository productHistoryRepository;
 
     @Autowired
     private OrderTableRepository orderTableRepository;
@@ -50,6 +47,7 @@ public class OrderItemService {
             order.setOrderTableCity("Муром"); // Привязываем заказ к пользователю
             order.setOrderTableUser(user);
             order.setOrderTableCreatedAt(LocalDateTime.now());
+            order.setOrderStatus(OrderStatus.CREATED);
 
             // Рассчитать общую стоимость товаров
             int totalPrice = cartItems.stream()
@@ -60,14 +58,26 @@ public class OrderItemService {
             orderTableRepository.save(order);
             // Переносим товары из корзины в заказ
             for (CartItem cartItem : cartItems) {
+                ProductHistory ph = new ProductHistory();
+
+                ph.setProductName(cartItem.getCartItemProduct().getProductName());
+                ph.setProductPriceCent(cartItem.getCartItemProduct().getProductPriceCent());
+                ph.setProductDescription(cartItem.getCartItemProduct().getProductDescription());
+                ph.setBase64Image(cartItem.getCartItemProduct().getBase64Image());
+                ph.setProductImageData(cartItem.getCartItemProduct().getProductImageData());
+                ph.setProductQuantity(cartItem.getCartItemQuantity());
+
+                ProductHistory savedProductHistory = productHistoryRepository.save(ph);
+
                 OrderItem orderItem = new OrderItem();
+
                 orderItem.setOrderItemOrderTable(order);
-                orderItem.setOrderItemProduct(cartItem.getCartItemProduct());
+                orderItem.setOrderItemProductHistory(savedProductHistory);
                 orderItem.setOrderItemQuantity(cartItem.getCartItemQuantity());
-                orderItem.setOrderItemPrice(cartItem.getCartItemProduct().getProductPriceCent());
+                orderItem.setOrderItemPrice(savedProductHistory.getProductPriceCent() * cartItem.getCartItemQuantity());
+
                 orderItemRepository.save(orderItem);
             }
-
             // Очищаем корзину
             cartItemRepository.deleteByCartItemUser(user);
 
@@ -78,5 +88,9 @@ public class OrderItemService {
             // Перехватываем любые другие исключения
             throw new RuntimeException("Не удалось создать заказ, попробуйте позже");
         }
+    }
+    public String getUserEmail(String username) {
+        User user = userRepository.findByUserToEmail(username);
+        return user != null ? user.getUserEmail() : null;
     }
 }

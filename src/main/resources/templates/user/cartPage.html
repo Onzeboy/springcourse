@@ -81,7 +81,7 @@
         <nav>
             <ul class="nav-links">
                 <li><a th:href="@{/}">Главная</a></li>
-                <li><a th:href="@{/orders}">Мои заказы</a></li>
+                <li><a th:href="@{/user/orders}">Мои заказы</a></li>
             </ul>
         </nav>
     </div>
@@ -107,11 +107,11 @@
                     <img th:src="${item.cartItemProduct.base64Image}" alt="Product Image" class="product-image">
                 </td>
                 <td th:text="${item.cartItemProduct.productName}">Название продукта</td>
-                <td th:text="${item.cartItemProduct.productPriceCent} + ' ₽'">Цена</td>
+                <td th:text="${#numbers.formatDecimal(item.cartItemProduct.productPriceCent / 100.0, 0, 2)} + ' ₽'">Цена</td>
                 <td th:text="${item.cartItemQuantity}">Количество</td>
-                <td th:text="${item.cartItemProduct.productPriceCent * item.cartItemQuantity} + ' ₽'">Итого</td>
+                <td th:text="${#numbers.formatDecimal(item.cartItemProduct.productPriceCent * item.cartItemQuantity  / 100.0, 0, 2)} + ' ₽'">Итого</td>
                 <td>
-                    <form th:action="@{/cart/remove}" method="post">
+                    <form th:action="@{/user/cart/remove}" method="post">
                         <!-- Передаём ID товара скрытым полем -->
                         <input type="hidden" name="itemId" th:value="${item.id}" />
                         <button type="submit" class="remove-button">Удалить</button>
@@ -128,7 +128,7 @@
 <footer>
     <div class="footer-content">
         <div class="total-sum">
-            Общая сумма: <span th:text="${totalSum} + ' ₽'">0 ₽</span>
+            Общая сумма: <span th:text="${#numbers.formatDecimal(totalSum / 100.0, 0, 2)} + ' ₽'">0 ₽</span>
         </div>
         <button id="checkoutBtn">Оформить заказ</button>
     </div>
@@ -139,7 +139,7 @@
     <div class="modal-content">
         <span class="close">&times;</span>
         <h2>Оформление заказа</h2>
-        <form th:action="@{/makeOrder}" method="post">
+        <form th:action="@{/user/makeOrder}" method="post">
             <div class="form-group">
                 <label for="street">Улица:</label>
                 <input type="text" id="street" name="street" required>

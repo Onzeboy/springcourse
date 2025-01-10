@@ -1,20 +1,20 @@
 package ru.course.spring.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.course.spring.pojo.CartItem;
+import ru.course.spring.pojo.Product;
 import ru.course.spring.pojo.User;
 import ru.course.spring.services.CartItemService;
+import ru.course.spring.services.ProductService;
 import ru.course.spring.services.UserService;
 
 import java.security.Principal;
 import java.util.Base64;
 import java.util.List;
-import java.util.Map;
 
 @Controller
 public class CartItemController {
@@ -24,22 +24,45 @@ public class CartItemController {
     @Autowired
     private UserService userService;
 
-    @PostMapping("/addToCart")
+    @Autowired
+    private ProductService productService;
+
+
+    @PostMapping("/user/addToCart")
     public String addToCart(@RequestParam("productId") Long productId,
                             @RequestParam("quantity") int quantity,
-                            @RequestParam("price") int price,
-                            Principal principal) {
+                            Principal principal,
+                            RedirectAttributes redirectAttributes) {
         // Получение имени пользователя (email или username)
         String userEmail = principal.getName();
 
-        // Найдите пользователя в базе данных по имени (если нужно ID)
+        // Найдите пользователя в базе данных по email
         User user = userService.findByUserEmail(userEmail);
 
-        cartItemService.addToCart(productId, quantity, price, user.getId());
-        return "redirect:/products";
+        // Найдите продукт по ID
+        Product product = productService.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Продукт не найден."));
+
+        // Проверьте доступное количество
+        if (product.getProductQuantity() < quantity) {
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    "Недостаточно товара в наличии. Доступно: " + product.getProductQuantity());
+            return "redirect:/products";
+        }
+
+        // Уменьшите количество продукта
+        product.setProductQuantity(product.getProductQuantity() - quantity);
+        productService.save(product);
+
+        // Добавьте товар в корзину
+        cartItemService.addToCart(productId, quantity, product.getProductPriceCent(), user.getId());
+
+        redirectAttributes.addFlashAttribute("successMessage", "Товар добавлен в корзину.");
+        return "mainPage";
     }
 
-    @GetMapping("/cart")
+
+    @GetMapping("/user/cart")
     public String cart(Model model, Principal principal){
         if (principal == null) {
             return "redirect:/login"; // Перенаправление, если пользователь не аутентифицирован
@@ -66,9 +89,9 @@ public class CartItemController {
                 .mapToInt(item -> item.getCartItemProduct().getProductPriceCent() * item.getCartItemQuantity())
                 .sum();
         model.addAttribute("totalSum", totalSum);
-        return "cartPage";
+        return "/user/cartPage";
     }
-    @PostMapping("/cart/remove")
+    @PostMapping("/user/cart/remove")
     public String removeItem(@RequestParam("itemId") Long itemId) {
         cartItemService.removeItemFromCart(itemId);
         return "redirect:/cart";

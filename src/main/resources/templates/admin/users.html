@@ -7,10 +7,74 @@
     <!-- Bootstrap CSS для упрощения стилизации -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+<style>
+    body {
+        padding-top: 80px; /* Учитываем высоту хедера */
+    }
+
+    header {
+        background-color: #ffffff;
+        padding: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        position: fixed; /* Фиксируем хедер */
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1000;
+    }
+
+    .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+        box-sizing: border-box;
+    }
+
+    header h1 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: bold;
+        color: #333;
+    }
+
+    nav {
+        /* Дополнительные стили при необходимости */
+    }
+
+    .nav-links {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        gap: 20px;
+    }
+
+    .nav-links li a {
+        text-decoration: none;
+        color: #333;
+        font-size: 16px;
+        transition: color 0.3s;
+    }
+
+    .nav-links li a:hover {
+        color: #4caf50;
+    }
+</style>
+<header>
+    <div class="header-content">
+        <h1>Управление пользователями</h1>
+        <nav>
+            <ul class="nav-links">
+                <li><a th:href="@{/}">Главная</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
 <body>
 <div class="container mt-5">
-    <h1>Управление пользователями</h1>
-
     <!-- Сообщения об успехе или ошибке -->
     <div th:if="${successMessage}" class="alert alert-success" role="alert">
         <p th:text="${successMessage}"></p>
@@ -57,7 +121,7 @@
 <!-- Модальное окно для редактирования пользователя -->
 <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <form th:action="@{users/edit}" method="post">
+        <form th:action="@{/admin/users/edit}" method="post">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="editUserModalLabel">Редактировать пользователя</h5>
@@ -71,11 +135,15 @@
                     </div>
                     <div class="mb-3">
                         <label for="edit-email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="edit-email" name="email" required>
+                        <input type="email" class="form-control" id="edit-email" name="email" required
+                               pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                               title="Введите корректный email, например, example@mail.com">
                     </div>
                     <div class="mb-3">
                         <label for="edit-phone_number" class="form-label">Номер телефона</label>
-                        <input type="tel" class="form-control" id="edit-phone_number" name="phone_number" pattern="^\+?[0-9\s\-()]*$" required>
+                        <input type="tel" class="form-control" id="edit-phone_number" name="phone_number" required
+                               pattern="^\+7\d{10}$"
+                               title="Введите номер телефона в формате +7XXXXXXXXXX">
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Роли</label>
@@ -119,17 +187,17 @@
         modal.querySelector('#edit-email').value = email;
         modal.querySelector('#edit-phone_number').value = phone;
 
-        // Сброс всех чекбоксов
-        var checkboxes = modal.querySelectorAll('input[type="checkbox"][name="roles"]');
-        checkboxes.forEach(function(checkbox) {
-            checkbox.checked = false;
+        // Сброс всех радиокнопок
+        var radios = modal.querySelectorAll('input[type="radio"][name="role"]');
+        radios.forEach(function(radio) {
+            radio.checked = false;
         });
 
-        // Установка чекбоксов в соответствии с ролями пользователя
+        // Установка радиокнопок в соответствии с ролью пользователя
         roles.forEach(function(role) {
-            var checkbox = modal.querySelector('input[type="checkbox"][value="' + role + '"]');
-            if (checkbox) {
-                checkbox.checked = true;
+            var radio = modal.querySelector('input[type="radio"][value="' + role + '"]');
+            if (radio) {
+                radio.checked = true;
             }
         });
     });

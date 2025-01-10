@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap JS Bundle (включает Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Products</title>
@@ -8,54 +12,267 @@
 </head>
 <body th:with="currentUser=${#authentication.principal}">
 <header>
-    <div class="logo">Logo</div>
+    <div class="logo">ДОСТАВКА</div>
     <nav>
         <ul>
-            <li sec:authorize="isAuthenticated()"><a href="/cart">CArt</a></li>
-            <li><a href="#">Link 2</a></li>
+            <li sec:authorize="hasRole('ADMIN')"><a href="/admin/add">Добавление товаров</a></li>
+            <li sec:authorize="hasRole('ADMIN')"><a href="/admin/users">Управление пользователями</a></li>
+            <li sec:authorize="hasRole('ADMIN')"><a href="/admin/allorders">Управление заказами</a></li>
+            <li sec:authorize="hasRole('USER')"><a href="/user/cart">Корзина</a></li>
+            <li sec:authorize="hasRole('USER')"><a href="/user/orders">Заказы</a></li>
+            <li sec:authorize="hasRole('USER')"><a href="/user/orderHistory">История Заказов</a></li>
             <li sec:authorize="isAuthenticated()">
-                <a href="/logout" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</a>
+                <a href="/logout" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Выход</a>
                 <form id="logout-form" th:action="@{/logout}" method="post" style="display: none;">
                     <input type="hidden"/>
                 </form>
             </li>
             <li sec:authorize="!isAuthenticated()">
-                <a href="/login">Login</a>
+                <a href="/login">Войти</a>
             </li>
         </ul>
     </nav>
 </header>
 
 <script th:inline="javascript">
-    const currentUserId =[[${#authentication.principal}]];
+    const currentUserId = [[${#authentication.principal}]];
 </script>
+
 <main class="container" id="product-container">
     <div class="product-box" th:each="product : ${products}">
         <div class="product-image">
-            <img th:src="${product.base64Image}" alt="Product Image">
+            <img th:src="${product.base64Image}" alt="Product Image" class="compressed-image">
         </div>
         <div class="product-info">
             <p class="product-name" th:text="${product.productName}">Product Name</p>
-            <p class="product-quantity">Кол-во: <span th:text="${product.productQuantity}">0</span></p>
+            <p class="product-desc"><span th:text="${product.productDescription}">Описание</span></p>
+            <p class="product-quantity">Кол-во на складе: <span th:text="${product.productQuantity}">0</span></p>
             <div class="product-price-cart">
-                <p class="product-price">Цена: <span th:text="${product.productPriceCent}">0.00</span></p>
+                <p class="product-price">Цена: <span th:text="${#numbers.formatDecimal(product.productPriceCent / 100.0, 0, 2)}">0.00</span></p>
                 <div class="quantity-and-cart">
-                    <input id="quantity-${product.id}" type="number" min="1" value="1" class="quantity-picker">
-                    <a href="#" class="add-to-cart"
+                    <input sec:authorize="hasRole('USER')" type="number" min="1" max="${product.productQuantity}" value="1" class="quantity-picker"
+                           th:id="'quantity-' + ${product.id}" th:data-max-quantity="${product.productQuantity}">
+                    <a sec:authorize="hasRole('USER')" href="#" class="add-to-cart"
                        th:data-product-id="${product.id}"
                        th:data-product-price="${product.productPriceCent}">
                         <img src="img/icons8-тележка-из-магазина-64.png" alt="Add to Cart">
                     </a>
+                    <button sec:authorize="hasRole('ADMIN')" type="button" class="btn btn-primary btn-sm edit-product"
+                            th:data-product-id="${product.id}"
+                            th:data-product-name="${product.productName}"
+                            th:data-product-description="${product.productDescription}"
+                            th:data-product-quantity="${product.productQuantity}"
+                            th:data-product-price="${product.productPriceCent}">
+                        Редактировать
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 </main>
 
-<footer class="footer">
-    <button id="load-more" data-page="1" data-size="12">Load More</button>
-</footer>
+<!-- Модальное окно -->
+<div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editProductModalLabel">Редактировать продукт</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-product-form">
+                    <input type="hidden" id="edit-product-id" name="productId">
+                    <div class="mb-3">
+                        <label for="edit-product-name" class="form-label">Название</label>
+                        <input type="text" class="form-control" id="edit-product-name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-product-description" class="form-label">Описание</label>
+                        <textarea class="form-control" id="edit-product-description" name="description" rows="2" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-product-quantity" class="form-label">Количество</label>
+                        <input type="number" class="form-control" id="edit-product-quantity" name="quantity" min="0" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-product-price" class="form-label">Цена (в копейках)</label>
+                        <input type="number" class="form-control" id="edit-product-price" name="price" min="0" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-primary" id="save-product-button">Сохранить</button>
+                <button type="button" class="btn btn-danger" id="delete-product-button">Удалить</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Ваш скрипт -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const container = document.getElementById('product-container');
 
-<script src="js/mainpagejs.js"></script>
+        // Обработчик клика на кнопку "Add to Cart"
+        container.addEventListener('click', function (event) {
+            if (event.target.closest('.add-to-cart')) {
+                event.preventDefault();
+
+                const addToCartButton = event.target.closest('.add-to-cart');
+                const productId = addToCartButton.getAttribute('data-product-id');
+                const productPrice = addToCartButton.getAttribute('data-product-price');
+                const quantityInput = addToCartButton.closest('.quantity-and-cart').querySelector('.quantity-picker');
+                let quantity = parseInt(quantityInput.value, 10);
+                const maxQuantity = Math.min(
+                    parseInt(quantityInput.getAttribute('data-max-quantity'), 10),
+                    50 // Ограничение на 50 штук
+                );
+
+                // Проверяем авторизацию
+                if (!currentUserId) {
+                    alert('Пожалуйста, авторизуйтесь, чтобы добавить товар в корзину.');
+                    return;
+                }
+
+                // Проверяем корректность введенного количества
+                if (quantity < 1 || quantity > maxQuantity) {
+                    alert(`Введите корректное количество (от 1 до ${maxQuantity}).`);
+                    return;
+                }
+
+                // Формируем данные для отправки
+                const formData = new URLSearchParams();
+                formData.append('productId', productId);
+                formData.append('quantity', quantity);
+                formData.append('price', productPrice);
+
+                // Отправляем POST-запрос
+                fetch('/user/addToCart', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: formData.toString(),
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            alert('Товар успешно добавлен в корзину!');
+
+                            // Обновляем количество на складе
+                            const productQuantitySpan = addToCartButton
+                                .closest('.product-info')
+                                .querySelector('.product-quantity span');
+                            const currentQuantity = parseInt(productQuantitySpan.textContent, 10);
+
+                            const newQuantity = currentQuantity - quantity;
+                            productQuantitySpan.textContent = newQuantity;
+
+                            // Если товара больше нет, блокируем добавление в корзину
+                            if (newQuantity <= 0) {
+                                quantityInput.setAttribute('disabled', 'true');
+                                addToCartButton.classList.add('disabled');
+                                addToCartButton.style.pointerEvents = 'none';
+                                alert('Товар закончился на складе.');
+                            }
+                        } else {
+                            response.text().then(errorMessage => {
+                                alert(`Ошибка: ${errorMessage}`);
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Ошибка загрузки:', error);
+                        alert('Не удалось обработать запрос. Попробуйте позже.');
+                    });
+            }
+        });
+
+        // Обработчик клика на кнопку "Редактировать"
+        container.addEventListener('click', function (event) {
+            if (event.target.closest('.edit-product')) {
+                const editButton = event.target.closest('.edit-product');
+                const productId = editButton.getAttribute('data-product-id');
+                const productName = editButton.getAttribute('data-product-name');
+                const productDescription = editButton.getAttribute('data-product-description');
+                const productQuantity = editButton.getAttribute('data-product-quantity');
+                const productPrice = editButton.getAttribute('data-product-price');
+
+                // Заполняем данные в модальном окне
+                document.getElementById('edit-product-id').value = productId;
+                document.getElementById('edit-product-name').value = productName;
+                document.getElementById('edit-product-description').value = productDescription;
+                document.getElementById('edit-product-quantity').value = productQuantity;
+                document.getElementById('edit-product-price').value = productPrice;
+
+                // Показываем модальное окно
+                const editProductModal = new bootstrap.Modal(document.getElementById('editProductModal'));
+                editProductModal.show();
+            }
+        });
+
+        // Обработчик кнопки "Сохранить" в модальном окне
+        const saveProductButton = document.getElementById('save-product-button');
+        saveProductButton.addEventListener('click', function () {
+            const form = document.getElementById('edit-product-form');
+            const formData = new URLSearchParams(new FormData(form));
+
+            fetch('admin/editProduct', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: formData.toString(),
+            })
+                .then(response => {
+                    if (response.ok) {
+                        response.text().then(message => {
+                            alert('Товар отредактирован!');
+                            const modal = bootstrap.Modal.getInstance(document.getElementById('editProductModal'));
+                            modal.hide();
+                            location.reload();
+                        });
+                    } else {
+                        response.text().then(errorMessage => {
+                            alert(`Ошибка: ${errorMessage}`);
+                        });
+                    }
+                })
+                .catch(error => console.error('Ошибка:', error));
+        });
+
+        // Обработчик кнопки "Удалить" в модальном окне
+        const deleteProductButton = document.getElementById('delete-product-button');
+        deleteProductButton.addEventListener('click', function () {
+            const productId = document.getElementById('edit-product-id').value;
+            if (confirm('Вы уверены, что хотите удалить этот продукт?')) {
+                const formData = new URLSearchParams();
+                formData.append('productId', productId);
+
+                fetch('admin/deleteProduct', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: formData.toString(),
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            response.text().then(message => {
+                                alert('Товар удален!');
+                                const modal = bootstrap.Modal.getInstance(document.getElementById('editProductModal'));
+                                modal.hide();
+                                location.reload();
+                            });
+                        } else {
+                            response.text().then(errorMessage => {
+                                alert(`Ошибка: ${errorMessage}`);
+                            });
+                        }
+                    })
+                    .catch(error => console.error('Ошибка:', error));
+            }
+        });
+    });
+</script>
 </body>
 </html>

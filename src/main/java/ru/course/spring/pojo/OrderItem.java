@@ -1,7 +1,6 @@
 package ru.course.spring.pojo;
 
 import jakarta.persistence.*;
-import jakarta.persistence.criteria.Order;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,8 +21,8 @@ public class OrderItem {
     private OrderTable orderItemOrderTable;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false)
-    private Product orderItemProduct;
+    @JoinColumn(name = "productHistory_id", nullable = false)
+    private ProductHistory orderItemProductHistory;
 
     @Column(name = "quantity", nullable = false)
     private int orderItemQuantity;
@@ -47,12 +46,12 @@ public class OrderItem {
         this.orderItemOrderTable = orderItemOrderTable;
     }
 
-    public Product getOrderItemProduct() {
-        return orderItemProduct;
+    public ProductHistory getOrderItemProductHistory() {
+        return orderItemProductHistory;
     }
 
-    public void setOrderItemProduct(Product orderItemProduct) {
-        this.orderItemProduct = orderItemProduct;
+    public void setOrderItemProductHistory(ProductHistory orderItemProductHistory) {
+        this.orderItemProductHistory = orderItemProductHistory;
     }
 
     public int getOrderItemQuantity() {

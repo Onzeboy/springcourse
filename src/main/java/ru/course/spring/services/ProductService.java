@@ -10,14 +10,22 @@ import org.springframework.stereotype.Service;
 import ru.course.spring.pojo.Product;
 import ru.course.spring.repository.ProductRepository;
 
+import java.util.List;
+import java.util.Optional;
+
 @Service
 public class ProductService {
 
     @Autowired
     private ProductRepository productRepository;
 
-    public Page<Product> getProducts(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return productRepository.findAll(pageable);
+    public List<Product> getProducts() {
+        return productRepository.findAll();
+    }
+    public Optional<Product> findById(Long productId) {
+        return productRepository.findById(productId);
+    }
+    public void save(Product product) {
+        productRepository.save(product);
     }
 }

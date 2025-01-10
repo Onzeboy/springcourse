@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Управление заказами</title>
+    <link rel="stylesheet" th:href="@{/css/adminOrders.css}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f4f4f4;
+        }
+
+        tr {
+            cursor: pointer;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .edit-button, .details-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-right: 5px;
+        }
+
+        .details-button:hover {
+            background-color: #0056b3;
+        }
+
+        .edit-button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Модальное окно */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 15% auto;
+            padding: 20px;
+            width: 400px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: black;
+        }
+
+        .save-button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .cancel-button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .cancel-button:hover {
+            background-color: #c82333;
+        }
+        header {
+            background-color: #ffffff;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: fixed; /* Фиксируем хедер */
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        header {
+            background-color: #ffffff;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: fixed; /* Фиксируем хедер */
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            box-sizing: border-box;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        nav {
+            /* Дополнительные стили при необходимости */
+        }
+
+        .nav-links {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links li a {
+            text-decoration: none;
+            color: #333;
+            font-size: 16px;
+            transition: color 0.3s;
+        }
+
+        .nav-links li a:hover {
+            color: #4caf50;
+        }
+
+
+    </style>
+</head>
+<header>
+    <div class="header-content">
+        <h1>Управление заказами</h1>
+        <nav>
+            <ul class="nav-links">
+                <li><a th:href="@{/}">Главная</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+<body>
+<div class="container">
+    <h1>Управление заказами</h1>
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Пользователь</th>
+            <th>Дата</th>
+            <th>Адрес</th>
+            <th>Сумма</th>
+            <th>Статус</th>
+            <th>Действия</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="order : ${orders}">
+            <td th:text="${order.id}"></td>
+            <td th:text="${order.orderTableUser.userName}"></td>
+            <td th:text="${order.formattedDate}"></td>
+            <td th:text="${order.orderTableCity} + ', ' + ${order.orderTableStreet} + ' ' + ${order.orderTableHome}"></td>
+            <td th:text="${#numbers.formatDecimal(order.orderTableTotalPrice / 100.0, 0, 2)} + ' ₽'"></td>
+            <td th:text="${order.orderStatus}"></td>
+            <td>
+                <button class="details-button" th:onclick="'window.location.href=\'/admin/allorders/' + ${order.id} + '\';'">Просмотр</button>
+                <button class="edit-button" th:attr="data-id=${order.id}" onclick="openModal(this)">Изменить статус</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Модальное окно -->
+<div id="statusModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2>Изменить статус заказа</h2>
+        <form th:action="@{/admin/allorders/update}" method="post">
+            <input type="hidden" id="orderId" name="orderId">
+            <div>
+                <label for="status">Новый статус:</label>
+                <select id="status" name="status" class="status-select">
+                    <option value="CREATED">Создан</option>
+                    <option value="SHIPPED">Отправлен</option>
+                    <option value="CANCELED">Отменен</option>
+                    <option value="DELIVERED">Доставлен</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="save-button">Сохранить</button>
+                <button type="button" class="cancel-button" onclick="closeModal()">Отмена</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Функция открытия модального окна
+    function openModal(button) {
+        const modal = document.getElementById("statusModal");
+        const orderId = button.getAttribute("data-id");
+        document.getElementById("orderId").value = orderId;
+        modal.style.display = "block";
+    }
+
+    // Функция закрытия модального окна
+    function closeModal() {
+        const modal = document.getElementById("statusModal");
+        modal.style.display = "none";
+    }
+
+    // Закрытие модального окна при клике вне его
+    window.onclick = function (event) {
+        const modal = document.getElementById("statusModal");
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    };
+</script>
+</body>
+</html>

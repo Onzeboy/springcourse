@@ -39,7 +39,16 @@ public class UserService {
     public void updateUser(Long id, String username, String phone, String email, String roleString) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Пользователь не найден"));
+        Optional<User> existingUserByEmail = userRepository.findByUserEmail(email);
+        if (existingUserByEmail.isPresent() && !existingUserByEmail.get().getId().equals(id)) {
+            throw new IllegalArgumentException("Этот email уже зарегистрирован.");
+        }
 
+        // Проверка уникальности номера телефона
+        Optional<User> existingUserByPhone = userRepository.findByUserPhoneNumber(phone);
+        if (existingUserByPhone.isPresent() && !existingUserByPhone.get().getId().equals(id)) {
+            throw new IllegalArgumentException("Этот номер телефона уже зарегистрирован.");
+        }
         user.setUserName(username);
         user.setUserEmail(email);
         user.setUserPhoneNumber(phone);
@@ -51,4 +60,5 @@ public class UserService {
 
         userRepository.save(user);
     }
+
 }
