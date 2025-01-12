@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
+        /* Ваши существующие стили */
         body {
             display: flex;
             justify-content: center;
@@ -70,31 +71,44 @@
         .register-container .login-link:hover {
             text-decoration: underline;
         }
+        .error-message {
+            color: red;
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 <body>
 <div class="register-container">
     <h2>Регистрация</h2>
+
+    <!-- Отображение сообщения об ошибке, если оно существует -->
+    <div th:if="${error}" class="error-message" th:text="${error}"></div>
+
     <form th:action="@{/register}" method="post">
         <div class="form-group">
             <label for="username">Имя</label>
-            <input type="text" id="username" name="username" required>
+            <input type="text" id="username" name="username" required
+                   th:value="${username}">
         </div>
         <div class="form-group">
             <label for="email">E-mail</label>
             <input type="email" id="email" name="email" required
                    pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
-                   title="Введите корректный email, например, example@mail.com">
+                   title="Введите корректный email, например, example@mail.com"
+                   th:value="${email}">
         </div>
         <div class="form-group">
             <label for="phoneNumber">Номер телефона</label>
             <input type="text" id="phoneNumber" name="phoneNumber" required
                    pattern="\+7\d{10}"
-                   title="Введите номер телефона в формате +7XXXXXXXXXX">
+                   title="Введите номер телефона в формате +7XXXXXXXXXX"
+                   th:value="${phoneNumber}">
         </div>
         <div class="form-group">
             <label for="password">Пароль</label>
-            <input type="password" id="password" name="password" required>
+            <input type="password" id="password" name="password" required
+                   minlength="3" maxlength="50"
+                   title="Пароль должен содержать не менее 3 символов">
         </div>
         <button type="submit" class="btn">Зарегистрироваться</button>
     </form>

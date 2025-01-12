@@ -89,6 +89,7 @@
         </div>
         <div class="order-info">
             <p><strong>Дата заказа:</strong> <span th:text="${order.formattedDate}"></span></p>
+            <p><strong>Статус:</strong> <span th:text="${order.orderStatus.toString()}"></span></p>
             <p><strong>Адрес доставки:</strong>
                 <span th:text="${order.orderTableCity} + ', ' + ${order.orderTableStreet} + ' ' + ${order.orderTableHome}"></span>
             </p>

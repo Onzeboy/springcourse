@@ -1,5 +1,8 @@
 package ru.course.spring.controllers;
 
+import jakarta.servlet.http.HttpServletResponse;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
@@ -15,7 +18,9 @@ import ru.course.spring.pojo.User;
 import ru.course.spring.repository.OrderItemRepository;
 import ru.course.spring.repository.OrderTableRepository;
 import ru.course.spring.repository.UserRepository;
+import ru.course.spring.services.OrderTableService;
 
+import java.io.IOException;
 import java.security.Principal;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -29,7 +34,11 @@ public class OrderTableController {
     private UserRepository userRepository;
 
     @Autowired
+    private OrderTableService orderTableService;
+
+    @Autowired
     private OrderItemRepository orderItemRepository;
+
     @GetMapping("/user/orders")
     public String getOrders(Model model, Principal principal) {
         if (principal == null) {
@@ -124,5 +133,70 @@ public class OrderTableController {
                 .orElseThrow(() -> new IllegalArgumentException("Заказ не найден"));
         model.addAttribute("order", order);
         return "/user/orderDetails"; // Шаблон для отображения деталей заказа
+    }
+
+    @GetMapping("/admin/allorders/export")
+    public void exportOrdersToExcel(HttpServletResponse response) throws IOException {
+        try (Workbook workbook = new XSSFWorkbook()) {
+            Sheet sheet = workbook.createSheet("Orders");
+
+            // Заголовки колонок
+            Row headerRow = sheet.createRow(0);
+            String[] columns = {"ID", "Пользователь", "Дата", "Адрес", "Сумма", "Статус"};
+            for (int i = 0; i < columns.length; i++) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(columns[i]);
+            }
+
+            // Получение данных заказов
+            List<OrderTable> orders = orderTableService.getAllOrders();
+
+            // Формат для даты
+            CellStyle dateCellStyle = workbook.createCellStyle();
+            CreationHelper createHelper = workbook.getCreationHelper();
+            dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("yyyy-MM-dd HH:mm:ss"));
+
+            // Заполнение данных
+            int rowNum = 1;
+            for (OrderTable order : orders) {
+                Row row = sheet.createRow(rowNum++);
+
+                // ID
+                row.createCell(0).setCellValue(order.getId());
+
+                // Имя пользователя
+                row.createCell(1).setCellValue(order.getOrderTableUser().getUserName());
+
+                // Дата создания заказа
+                Cell dateCell = row.createCell(2);
+                dateCell.setCellValue(java.sql.Timestamp.valueOf(order.getOrderTableCreatedAt())); // Преобразуем LocalDateTime в Timestamp
+                dateCell.setCellStyle(dateCellStyle);
+
+                // Адрес
+                row.createCell(3).setCellValue(order.getOrderTableCity() + ", " +
+                        order.getOrderTableStreet() + " " + order.getOrderTableHome());
+
+                // Сумма
+                row.createCell(4).setCellValue(order.getOrderTableTotalPrice() / 100.0);
+
+                // Статус
+                row.createCell(5).setCellValue(order.getOrderStatus().toString());
+            }
+
+            // Автоширина колонок
+            for (int i = 0; i < columns.length; i++) {
+                sheet.autoSizeColumn(i);
+            }
+
+            // Установка заголовков для скачивания файла
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setHeader("Content-Disposition", "attachment; filename=orders.xlsx");
+
+            // Запись файла в выходной поток
+            workbook.write(response.getOutputStream());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException("Ошибка при экспорте заказов в Excel.");
+        }
     }
 }

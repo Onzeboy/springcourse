@@ -4,15 +4,12 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import ru.course.spring.config.PasswordEncoderConfig;
 import ru.course.spring.pojo.Role;
 import ru.course.spring.pojo.User;
 import ru.course.spring.repository.UserRepository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -29,6 +26,10 @@ public class UserService {
 
     public User findByUserEmail(String email) {
         return userRepository.findByUserEmail(email).orElse(null);
+    }
+
+    public Optional<User> findByUserPhoneNumber(String phone){
+        return userRepository.findByUserPhoneNumber(phone);
     }
 
     public List<User> getAllUsersExcept(Long currentUserId) {
